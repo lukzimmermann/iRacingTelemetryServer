@@ -1,1 +1,1 @@
-# iracing_telemetry_server
+# iRacing Telemetry Server
