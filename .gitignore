@@ -137,3 +137,4 @@ dmypy.json
 
 # Project specific
 app.log
+telemetry_data

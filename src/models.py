@@ -1,6 +1,4 @@
-from enum import Enum
-from pydantic_core import Url
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, ForeignKeyConstraint, String, Integer, func
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, String, Integer, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
@@ -11,41 +9,34 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    gender = Column(Integer)
     email = Column(String(50), unique=True, nullable=False)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
     password_hash = Column(String(60), nullable=False)
-    job_title = Column(String(50), nullable=True)
     create_at = Column(DateTime, default=func.now(), nullable=False)
     update_at = Column(DateTime, nullable=True)
     disabled = Column(Boolean, default=False, nullable=False)
 
+    friendships = relationship(
+        "Friendship",
+        primaryjoin="or_(User.id == Friendship.user_id, User.id == Friendship.friend_id)",
+        backref="user"
+    )
+
     def __repr__(self):
         return f"id: {self.id}, name: {self.email}, hash: {self.password_hash[:10]}..."
-
  
-class Organisation(Base):
-    __tablename__ = "organisation"
-
+class Friendship(Base):
+    __tablename__ = "friendship"
+    
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    friend_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     create_at = Column(DateTime, default=func.now(), nullable=False)
-
-
-class UserOrganisation(Base):
-    __tablename__ = "user_organisation"
-
-    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
-    organisation_id = Column(Integer, ForeignKey('organisation.id', ondelete='CASCADE'), primary_key=True)
-    join_date = Column(DateTime, default=func.now(), nullable=False)
-
-    user = relationship("User", backref=backref("organisations", cascade="all, delete"))
-    organisation = relationship("Organisation", backref=backref("users", cascade="all, delete"))
+    confirmed = Column(Boolean, default=False, nullable=False)  # Indicates if the friendship is mutual/confirmed
 
     def __repr__(self):
-        return f"user_id: {self.user_id}, organisation_id: {self.organisation_id}, join_date: {self.join_date}"
-
+        return f"Friendship(id: {self.id}, user_id: {self.user_id}, friend_id: {self.friend_id}, confirmed: {self.confirmed})"
 
 class Log(Base):
     __tablename__ = "log"
@@ -62,3 +53,15 @@ class Log(Base):
     
     def __repr__(self):
         return f'id: {self.id} create_at: {self.create_at} level: {self.level} url: {self.url} method: {self.method} response_code: {self.response_code} process_time: {self.process_time}'
+    
+
+class AccessToken(Base):
+    __tablename__ = "access_token"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    create_at = Column(DateTime, default=func.now(), nullable=False)
+    token = Column(String(500), nullable=False)
+    
+    def __repr__(self):
+        return f'user_id: {self.user_id} create_at: {self.create_at}'

@@ -14,7 +14,7 @@ async def get_user(request: Request, response: Response):
 async def login(login: LoginDto, response: Response) -> UserDto:
     data = loginService.get_token(login)
     response.set_cookie(
-        key="Authorization:",
+        key="Authorization",
         path="/",
         value=f"Bearer {data["token"]}",
         httponly=True,

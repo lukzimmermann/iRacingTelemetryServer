@@ -6,12 +6,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 session = Database().get_session()
 
-# user = User()
-# user.name = "Nati"
-# user.password_hash = pwd_context.hash("nati")
+user = User()
+user.first_name = "Lukas"
+user.last_name = "Zimmermann"
+user.email = "lukas.zimmermann@schoggipopcorn.ch"
+user.password_hash = pwd_context.hash("19UfkMLk!*BGpC")
 
-# session.add(user)
-# session.commit()
+session.add(user)
+session.commit()
 
 results = session.query(User).all()
 

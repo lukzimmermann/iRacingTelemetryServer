@@ -27,12 +27,12 @@ def get_token(form_data: LoginDto):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     
     user_dto = __transform_to_UserDto(user)
+    print(user_dto)
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = __create_access_token(
         data={"id": user.id, 
-              "mail": user.email, 
-              "organisation": [org.model_dump() for org in user_dto.organisations]},
+              "mail": user.email},
         expires_delta=access_token_expires,
     )
 
@@ -45,18 +45,12 @@ def get_user_from_token(request: Request):
     return __transform_to_UserDto(user)
 
 def __transform_to_UserDto(user: User) -> UserDto:
-    organisations = [
-        OrganisationDto(id=org.organisation.id, name=org.organisation.name)
-        for org in user.organisations
-    ]
 
     return UserDto(
         id=user.id,
         first_name=user.first_name,
         last_name=user.last_name,
         email=user.email,
-        job_title=user.job_title,
-        organisations=organisations
     )
 
 def __authenticate_user(email: str, password: str):
@@ -81,7 +75,7 @@ def __verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def __get_payload_from_token(request: Request):
-    token = request.cookies.get("Authorization:")
+    token = request.cookies.get("Authorization")
     if token.startswith("Bearer "):
         token = token[len("Bearer "):]
 

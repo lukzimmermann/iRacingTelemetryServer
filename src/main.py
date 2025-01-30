@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
 from routes.login import loginController
 from routes.telemetryFile import telemetryFile
 from utils.middleware import log_middleware

@@ -28,8 +28,6 @@ class UserDto(BaseModel):
     email: str
     first_name: str
     last_name: str
-    job_title: str
-    organisations: list[OrganisationDto]
     
     class Config:
         from_attributes = True 

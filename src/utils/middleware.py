@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = "HS256"
 
 async def __get_body(request: Request) -> str:
-    if request.url.path.startswith("/auth"):
+    if request.url.path.startswith("/auth") or request.url.path.startswith("/telemetry-file"):
         return json.dumps({"message": "no body supported for /auth endpoints"})
     try:
         body = await request.json()
